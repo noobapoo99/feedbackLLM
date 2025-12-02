@@ -24,11 +24,25 @@ export const getAssignedProducts = async (req, res) => {
 
   const assignments = await prisma.assignment.findMany({
     where: { userId },
-    include: { product: true },
+    include: {
+      product: {
+        include: {
+          reviews: true,
+        },
+      },
+    },
   });
 
-  res.json(assignments.map((a) => a.product));
+  const formatted = assignments.map((a) => ({
+    id: a.product.id,
+    name: a.product.name,
+    category: a.product.category,
+    totalReviews: a.product.reviews.length,
+  }));
+
+  res.json(formatted);
 };
+
 export const getAssignedUsers = async (req, res) => {
   const { productId } = req.params;
 

@@ -20,3 +20,26 @@ export const getProducts = async (req, res) => {
   const products = await prisma.product.findMany();
   res.json(products);
 };
+export const getProductDetails = async (req, res) => {
+  const { productId } = req.params;
+
+  const product = await prisma.product.findUnique({
+    where: { id: productId },
+    include: {
+      reviews: {
+        include: { user: true },
+      },
+    },
+  });
+
+  return res.json(product);
+};
+export const getProductsByCategory = async (req, res) => {
+  const { category } = req.query;
+
+  const products = await prisma.product.findMany({
+    where: { category },
+  });
+
+  res.json(products);
+};
