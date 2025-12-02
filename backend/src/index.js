@@ -6,6 +6,7 @@ import { verifyToken } from "./middleware/auth.js";
 import { verifyRole } from "./middleware/role.js";
 import productRoutes from "./routes/product.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
+import assignmentRoutes from "./routes/assignment.routes.js";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -19,6 +20,8 @@ app.use((req, res, next) => {
 app.use("/auth", authRoutes);
 
 app.use("/products", productRoutes);
+
+app.use("/assignments", assignmentRoutes);
 
 app.use("/reviews", reviewRoutes);
 
