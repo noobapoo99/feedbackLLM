@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { analyzeSentiment } from "../utils/analyze.js";
 const prisma = new PrismaClient();
 
 // create review
@@ -6,12 +7,16 @@ export const addReview = async (req, res) => {
   try {
     const { productId, rating, content } = req.body;
 
+    const analysis = await analyzeSentiment(content);
+
     const review = await prisma.review.create({
       data: {
         productId,
         rating,
         content,
-        userId: req.user.id, // from JWT middleware
+        userId: req.user.id,
+        sentiment: analysis.label,
+        sentimentScore: analysis.score,
       },
     });
 
