@@ -1,9 +1,9 @@
 # Node
 node_modules/
-*.log
 
 # Python
 venv/
+**/venv/
 __pycache__/
 *.pyc
 
@@ -11,8 +11,5 @@ __pycache__/
 .env
 .env.local
 
-# Prisma
-prisma/migrations/
-
-# Mac junk
+# MacOS
 .DS_Store
