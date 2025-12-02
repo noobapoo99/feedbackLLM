@@ -1,10 +1,11 @@
 import express from "express";
 import cors from "cors";
 import { PrismaClient } from "@prisma/client";
-import authRoutes from "./routes/auth.route.js";
+import authRoutes from "./routes/auth.routes.js";
 import { verifyToken } from "./middleware/auth.js";
 import { verifyRole } from "./middleware/role.js";
-import productRoutes from "./routes/product.route.js";
+import productRoutes from "./routes/product.routes.js";
+import reviewRoutes from "./routes/review.routes.js";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -18,6 +19,8 @@ app.use((req, res, next) => {
 app.use("/auth", authRoutes);
 
 app.use("/products", productRoutes);
+
+app.use("/reviews", reviewRoutes);
 
 app.get("/", (req, res) => {
   res.json({ status: "Backend is running" });
