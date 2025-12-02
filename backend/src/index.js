@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import authRoutes from "./routes/auth.route.js";
 import { verifyToken } from "./middleware/auth.js";
 import { verifyRole } from "./middleware/role.js";
+import productRoutes from "./routes/product.route.js";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -15,6 +16,8 @@ app.use((req, res, next) => {
   next();
 });
 app.use("/auth", authRoutes);
+
+app.use("/products", productRoutes);
 
 app.get("/", (req, res) => {
   res.json({ status: "Backend is running" });
