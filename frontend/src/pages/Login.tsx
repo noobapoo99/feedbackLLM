@@ -20,9 +20,18 @@ export default function Login() {
 
     try {
       if (isLogin) {
-        // 🔥 USE AUTH CONTEXT LOGIN
+        // USE AUTH CONTEXT LOGIN
         await login(email, password);
-        navigate("/dashboard");
+
+        // Read user from localStorage-loaded context after login
+        const storedUser = JSON.parse(localStorage.getItem("user") || "null");
+
+        if (storedUser?.role === "ADMIN") {
+          navigate("/admin");
+        } else {
+          navigate("/dashboard");
+        }
+
         return;
       }
 

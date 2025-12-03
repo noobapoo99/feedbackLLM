@@ -28,25 +28,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       email,
       password,
     });
-    console.log("login start");
+
     const token = res.data.token;
-    console.log("token:", token);
     localStorage.setItem("token", token);
 
     const me = await axios.get("http://localhost:5001/auth/me", {
       headers: { Authorization: `Bearer ${token}` },
     });
-    console.log(me.data);
+
     setUser(me.data);
+    localStorage.setItem("user", JSON.stringify(me.data)); // ⭐ KEY CHANGE
   };
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user"); // ⭐ clear user
     setUser(null);
   };
 
   const checkUser = async () => {
     const token = localStorage.getItem("token");
+
+    // ⭐ If user already stored in localStorage, load it immediately
+    const localUser = localStorage.getItem("user");
+    if (localUser) {
+      setUser(JSON.parse(localUser));
+    }
+
     if (!token) return;
 
     try {
@@ -55,6 +63,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       setUser(res.data);
+      localStorage.setItem("user", JSON.stringify(res.data));
     } catch {
       logout();
     }

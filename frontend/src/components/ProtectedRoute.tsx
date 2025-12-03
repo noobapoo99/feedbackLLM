@@ -1,15 +1,31 @@
 import { useContext } from "react";
-import { Navigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import { Navigate } from "react-router-dom";
 
-export default function ProtectedRoute({
-  children,
-}: {
-  children: JSX.Element;
-}) {
+interface Props {
+  children: React.ReactNode;
+  role?: "ADMIN" | "ANALYST";
+}
+
+export default function ProtectedRoute({ children, role }: Props) {
   const { user } = useContext(AuthContext);
 
+  // Wait until user loads
+  const token = localStorage.getItem("token");
+
+  // If no token → not logged in → go to login
+  if (!token) return <Navigate to="/login" />;
+
+  // If token exists but user not loaded yet → loading
+  if (user === null) return <div>Loading...</div>;
+
+  // Not logged in
   if (!user) return <Navigate to="/login" />;
 
-  return children;
+  // Role mismatch
+  if (role && user.role !== role) {
+    return <Navigate to="/dashboard" />;
+  }
+
+  return <>{children}</>;
 }
