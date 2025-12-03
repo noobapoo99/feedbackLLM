@@ -28,14 +28,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       email,
       password,
     });
-
+    console.log("login start");
     const token = res.data.token;
+    console.log("token:", token);
     localStorage.setItem("token", token);
 
     const me = await axios.get("http://localhost:5001/auth/me", {
       headers: { Authorization: `Bearer ${token}` },
     });
-
+    console.log(me.data);
     setUser(me.data);
   };
 

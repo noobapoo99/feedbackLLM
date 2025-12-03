@@ -1,53 +1,52 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
-export default function Auth() {
+export default function Login() {
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
-  const [isLogin, setIsLogin] = useState(true); // Toggle Login / Signup
+  const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // HANDLE LOGIN / SIGNUP
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
-      const url = isLogin
-        ? "http://localhost:5001/auth/login"
-        : "http://localhost:5001/auth/register";
+      if (isLogin) {
+        // 🔥 USE AUTH CONTEXT LOGIN
+        await login(email, password);
+        navigate("/dashboard");
+        return;
+      }
 
-      const body = isLogin
-        ? { email, password }
-        : { name, email, password, role: "USER" };
-
-      const res = await fetch(url, {
+      // SIGNUP API CALL
+      const res = await fetch("http://localhost:5001/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          role: "ANALYST", // default role
+        }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Something went wrong");
-        setLoading(false);
+        setError(data.error || "Signup failed");
         return;
       }
 
-      // Save token if login
-      if (isLogin) {
-        localStorage.setItem("token", data.token);
-        navigate("/dashboard");
-      } else {
-        // After signup, switch to login
-        setIsLogin(true);
-      }
+      // Switch to login after signup
+      setIsLogin(true);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -120,7 +119,6 @@ export default function Auth() {
 
         <p className="text-center mt-4">
           {isLogin ? "New user?" : "Already have an account?"}
-
           <button
             onClick={() => setIsLogin(!isLogin)}
             className="link link-primary ml-1"
