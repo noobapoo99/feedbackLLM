@@ -8,6 +8,7 @@ import productRoutes from "./routes/product.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
 import assignmentRoutes from "./routes/assignment.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
+import analyticsRoutes from "./routes/analytics.routes.js";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -25,7 +26,7 @@ app.use("/products", productRoutes);
 app.use("/assignments", assignmentRoutes);
 
 app.use("/reviews", reviewRoutes);
-
+app.use("/analytics", analyticsRoutes);
 app.get("/", (req, res) => {
   res.json({ status: "Backend is running" });
 });
