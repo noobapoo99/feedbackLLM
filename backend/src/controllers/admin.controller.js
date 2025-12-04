@@ -1,6 +1,19 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
+export const getAnalysts = async (req, res) => {
+  const analysts = await prisma.user.findMany({
+    where: { role: "ANALYST" },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      createdAt: true,
+    },
+  });
+
+  res.json(analysts);
+};
 export const getAllUsers = async (req, res) => {
   const users = await prisma.user.findMany({
     select: {

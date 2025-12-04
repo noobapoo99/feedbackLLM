@@ -4,12 +4,14 @@ import {
   getAllProducts,
   getAllAssignments,
   getAdminSummary,
+  getAnalysts,
 } from "../controllers/admin.controller.js";
 import { verifyToken } from "../middleware/auth.js";
 import { verifyRole } from "../middleware/role.js";
 
 const router = express.Router();
 
+router.get("/analysts", verifyToken, verifyRole("ADMIN"), getAnalysts);
 router.get("/users", verifyToken, verifyRole("ADMIN"), getAllUsers);
 router.get("/products", verifyToken, verifyRole("ADMIN"), getAllProducts);
 router.get("/assignments", verifyToken, verifyRole("ADMIN"), getAllAssignments);
