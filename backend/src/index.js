@@ -10,6 +10,7 @@ import assignmentRoutes from "./routes/assignment.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import analyticsRoutes from "./routes/analytics.routes.js";
 import globalAnalyticsRoutes from "./routes/globalAnalytics.routes.js";
+import uploadCsvRoutes from "./routes/uploadCsv.routes.js";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -23,7 +24,7 @@ app.use((req, res, next) => {
 app.use("/auth", authRoutes);
 app.use("/admin", adminRoutes);
 app.use("/products", productRoutes);
-
+app.use("/admin/csv", uploadCsvRoutes);
 app.use("/assignments", assignmentRoutes);
 app.use("/analytics/global", globalAnalyticsRoutes);
 app.use("/reviews", reviewRoutes);

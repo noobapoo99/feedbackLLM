@@ -21,6 +21,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           <Link className="btn btn-ghost justify-start" to="/admin/assign">
             Assign Products
           </Link>
+          <Link className="btn btn-ghost justify-start" to="/admin/analytics">
+            Global Analytics
+          </Link>
         </nav>
       </aside>
 

@@ -10,6 +10,8 @@ import AssignProducts from "./pages/admin/AssginProducts";
 import AnalystDashboard from "./pages/analyst/AnalystDashboard";
 import ProductPage from "./pages/analyst/ProductPage";
 import ProductAnalytics from "./pages/analyst/ProductAnalytics";
+import AdminGlobalAnalytics from "./pages/admin/AdminGlobalAnalytics";
+import CsvUpload from "./pages/admin/csvUploader";
 
 function App() {
   return (
@@ -47,6 +49,22 @@ function App() {
             element={
               <ProtectedRoute role="ADMIN">
                 <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/analytics"
+            element={
+              <ProtectedRoute role="ADMIN">
+                <AdminGlobalAnalytics />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/upload"
+            element={
+              <ProtectedRoute role="ADMIN">
+                <CsvUpload />
               </ProtectedRoute>
             }
           />
