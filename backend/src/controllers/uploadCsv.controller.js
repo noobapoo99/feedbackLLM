@@ -1,11 +1,9 @@
 import fs from "fs";
 import csv from "csv-parser";
 import axios from "axios";
-import pLimit from "p-limit";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
-const limit = pLimit(5); // Limit Python NLP concurrency
 
 export const uploadCsv = async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No CSV uploaded" });
@@ -18,31 +16,29 @@ export const uploadCsv = async (req, res) => {
   let imported = 0;
   let skipped = 0;
 
-  const stream = fs
-    .createReadStream(filePath)
-    .pipe(csv())
-    .on("data", async (row) => {
+  try {
+    const stream = fs.createReadStream(filePath).pipe(csv());
+
+    stream.on("data", async (row) => {
       stream.pause();
 
       try {
-        const email =
-          (row["Reviewer Name"] || "user").toLowerCase().replace(/\s+/g, "") +
-          "@import.com";
+        if (!row["Review Text"]?.trim()) {
+          stream.resume();
+          return;
+        }
 
-        const user = await prisma.user.upsert({
-          where: { email },
-          update: {},
-          create: {
-            name: row["Reviewer Name"] || "Unknown User",
-            email,
-            password: "placeholder",
-            role: "ANALYST",
-          },
-        });
+        const reviewerName =
+          row["Reviewer Name"] || row["Reviewer"] || "Anonymous Reviewer";
 
+        // --- SAFE RATING PARSE ---
+        const rawRating = row["Rating"] || "";
+        const ratingMatch = rawRating.match(/\d+/);
+        const rating = ratingMatch ? parseInt(ratingMatch[0]) : 0;
+
+        // --- CHECK DUPLICATE ---
         const existing = await prisma.review.findFirst({
           where: {
-            userId: user.id,
             productId,
             content: row["Review Text"],
           },
@@ -54,37 +50,64 @@ export const uploadCsv = async (req, res) => {
           return;
         }
 
-        const sentimentRes = await axios.post("http://localhost:8000/analyze", {
-          text: row["Review Text"],
-        });
+        // --- NLP ANALYSIS ---
+        let sentiment = "neutral";
+        let sentimentScore = 0;
 
+        try {
+          const sentimentRes = await axios.post(
+            "http://localhost:8000/analyze",
+            { text: row["Review Text"] }
+          );
+
+          sentiment = sentimentRes.data.sentiment || "neutral";
+          sentimentScore = parseFloat(sentimentRes.data.score) || 0;
+        } catch (err) {
+          console.log("Sentiment API failed → using defaults");
+        }
+
+        // --- SAVE REVIEW ---
         await prisma.review.create({
           data: {
             content: row["Review Text"],
-            rating: parseInt(row["Rating"].replace(/\D+/g, "")) || 0,
-            sentiment: sentimentRes.data.sentiment,
-            sentimentScore: sentimentRes.data.score,
-            userId: user.id,
+            reviewerName,
+            rating,
+            sentiment,
+            sentimentScore, // <-- FLOAT NOW
             productId,
+            userId: null,
           },
         });
 
         imported++;
       } catch (err) {
-        console.error("Error importing row:", err);
+        console.error("Row error:", err);
       }
 
       stream.resume();
-    })
-    .on("end", () => {
-      fs.unlinkSync(filePath);
-      res.json({
+    });
+
+    stream.on("end", () => {
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+
+      return res.json({
         message: "CSV Import Complete",
         imported,
         skipped,
       });
-    })
-    .on("error", (err) => {
-      res.status(500).json({ error: "CSV parsing error", details: err });
     });
+
+    stream.on("error", (err) => {
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+
+      return res.status(500).json({
+        error: "CSV parsing failed",
+        details: err.message,
+      });
+    });
+  } catch (outerErr) {
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    console.error("Upload failed:", outerErr);
+    return res.status(500).json({ error: "Server error" });
+  }
 };

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { showToast } from "../../utils/toast";
 
 export default function UploadCSV() {
   const [products, setProducts] = useState<any[]>([]);
@@ -7,8 +8,9 @@ export default function UploadCSV() {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const token = localStorage.getItem("token");
+  const [uploadedCount, setUploadedCount] = useState<number | null>(null);
 
   // Fetch products (admin only)
   useEffect(() => {
@@ -26,7 +28,8 @@ export default function UploadCSV() {
       setMessage("Please select a product.");
       return;
     }
-
+    setLoading(true);
+    setUploadedCount(null);
     if (!file) {
       setMessage("Please choose a CSV file.");
       return;
@@ -47,12 +50,19 @@ export default function UploadCSV() {
           },
         }
       );
+      setUploadedCount(res.data.imported);
       setShowSuccess(true);
-
+      showToast(
+        `CSV uploaded successfully! Imported: ${res.data.imported}`,
+        "success"
+      );
       setMessage(`Uploaded successfully: ${res.data.imported} reviews`);
     } catch (err: any) {
       console.error(err);
       setMessage("Upload failed. Check console.");
+    } finally {
+      console.log("UPLOAD FINISHED — DISABLING LOADING");
+      setLoading(false);
     }
   };
 
@@ -88,9 +98,19 @@ export default function UploadCSV() {
         />
       </div>
 
-      <button className="btn btn-primary w-full" onClick={handleUpload}>
-        Upload Reviews CSV
+      <button
+        className={`px-4 py-2 rounded text-white transition 
+              ${
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700"
+              }`}
+        disabled={loading}
+        onClick={handleUpload}
+      >
+        {loading ? "Uploading…" : "Upload Reviews CSV"}
       </button>
+
       {showSuccess && (
         <dialog className="modal modal-open">
           <div className="modal-box">
