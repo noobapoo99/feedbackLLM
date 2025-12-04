@@ -7,6 +7,9 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import Users from "./pages/admin/Users";
 import Products from "./pages/admin/Products";
 import AssignProducts from "./pages/admin/AssginProducts";
+import AnalystDashboard from "./pages/analyst/AnalystDashboard";
+import ProductPage from "./pages/analyst/ProductPage";
+import ProductAnalytics from "./pages/analyst/ProductAnalytics";
 
 function App() {
   return (
@@ -18,8 +21,24 @@ function App() {
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute>
-                <Dashboard />
+              <ProtectedRoute role="ANALYST">
+                <AnalystDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/product/:id"
+            element={
+              <ProtectedRoute role="ANALYST">
+                <ProductPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/product/:id/analytics"
+            element={
+              <ProtectedRoute role="ANALYST">
+                <ProductAnalytics />
               </ProtectedRoute>
             }
           />
