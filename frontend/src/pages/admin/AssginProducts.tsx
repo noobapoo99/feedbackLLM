@@ -13,7 +13,7 @@ export default function AssignProducts() {
     const token = localStorage.getItem("token");
 
     axios
-      .get("http://localhost:5001/users", {
+      .get("http://localhost:5001/admin/analysts", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setUsers(res.data));
@@ -50,13 +50,11 @@ export default function AssignProducts() {
           onChange={(e) => setSelectedUser(e.target.value)}
         >
           <option>Select Analyst</option>
-          {users
-            .filter((u: any) => u.role === "ANALYST")
-            .map((u: any) => (
-              <option key={u.id} value={u.id}>
-                {u.name}
-              </option>
-            ))}
+          {users.map((u: any) => (
+            <option key={u.id} value={u.id}>
+              {u.name}
+            </option>
+          ))}
         </select>
 
         <select
