@@ -9,7 +9,7 @@ export default function Users() {
     const token = localStorage.getItem("token");
 
     axios
-      .get("http://localhost:5001/users", {
+      .get("http://localhost:5001/admin/users", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setUsers(res.data));
