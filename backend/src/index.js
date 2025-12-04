@@ -9,6 +9,7 @@ import reviewRoutes from "./routes/review.routes.js";
 import assignmentRoutes from "./routes/assignment.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import analyticsRoutes from "./routes/analytics.routes.js";
+import globalAnalyticsRoutes from "./routes/globalAnalytics.routes.js";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -24,7 +25,7 @@ app.use("/admin", adminRoutes);
 app.use("/products", productRoutes);
 
 app.use("/assignments", assignmentRoutes);
-
+app.use("/analytics/global", globalAnalyticsRoutes);
 app.use("/reviews", reviewRoutes);
 app.use("/analytics", analyticsRoutes);
 app.get("/", (req, res) => {
