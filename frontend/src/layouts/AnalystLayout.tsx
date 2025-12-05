@@ -19,7 +19,7 @@ export default function AnalystLayout({ children }: { children: ReactNode }) {
         </nav>
       </aside>
 
-      <main className="flex-1 p-8">{children}</main>
+      <main className="flex-1 p-8 relative">{children}</main>
     </div>
   );
 }

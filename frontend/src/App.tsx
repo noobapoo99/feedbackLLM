@@ -13,6 +13,7 @@ import ProductAnalytics from "./pages/analyst/ProductAnalytics";
 import AdminGlobalAnalytics from "./pages/admin/AdminGlobalAnalytics";
 import CsvUpload from "./pages/admin/csvUploader";
 import MyReviews from "./pages/analyst/MyReviews";
+import AnalyticsChat from "./pages/AnalyticsChat";
 
 function App() {
   return (
@@ -53,7 +54,14 @@ function App() {
               </ProtectedRoute>
             }
           />
-
+          <Route
+            path="/analytics/chat"
+            element={
+              <ProtectedRoute>
+                <AnalyticsChat />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/admin"
             element={
