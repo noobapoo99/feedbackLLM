@@ -29,7 +29,7 @@ export default function AssignProducts() {
     const token = localStorage.getItem("token");
 
     await axios.post(
-      "http://localhost:5001/assign",
+      "http://localhost:5001/assignments",
       {
         userId: selectedUser,
         productId: selectedProduct,

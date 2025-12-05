@@ -12,6 +12,10 @@ export default function AnalystLayout({ children }: { children: ReactNode }) {
           <Link className="btn btn-ghost justify-start" to="/dashboard">
             Assigned Products
           </Link>
+
+          <Link className="btn btn-ghost justify-start" to="/my-reviews">
+            My Reviews
+          </Link>
         </nav>
       </aside>
 

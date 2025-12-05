@@ -12,7 +12,7 @@ export const assignProduct = async (req, res) => {
         productId,
       },
     });
-
+    console.log(assignment);
     res.json({ message: "Product assigned", assignment });
   } catch (err) {
     res.status(400).json({ error: err.message });

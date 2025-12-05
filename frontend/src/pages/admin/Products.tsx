@@ -1,19 +1,27 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import AdminLayout from "../../layouts/AdminLayout";
 import axios from "axios";
 
+import { AuthContext } from "../../context/AuthContext";
+
 export default function Products() {
+  const { user } = useContext(AuthContext);
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
+    if (!user) return; // wait until logged in
+
     const token = localStorage.getItem("token");
 
     axios
       .get("http://localhost:5001/products", {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setProducts(res.data));
-  }, []);
+      .then((res) => {
+        setProducts(res.data);
+        console.log("Loaded:", res.data);
+      });
+  }, [user]); // run only after user is available
 
   return (
     <AdminLayout>
@@ -28,9 +36,9 @@ export default function Products() {
             <h2 className="text-xl font-semibold">{p.name}</h2>
             <p className="opacity-70 mb-3">{p.category}</p>
 
-            <div className="badge badge-accent">
+            {/* <div className="badge badge-accent">
               {p.reviewsCount || 0} reviews
-            </div>
+            </div> */}
           </div>
         ))}
       </div>

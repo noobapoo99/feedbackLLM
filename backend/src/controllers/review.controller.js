@@ -37,3 +37,35 @@ export const getReviews = async (req, res) => {
 
   res.json(reviews);
 };
+
+export const getMyReviews = async (req, res) => {
+  try {
+    const userId = req.user.id; // From JWT middleware
+
+    // 1. Find products assigned to this user
+    const assignments = await prisma.assignment.findMany({
+      where: { userId },
+      select: { productId: true },
+    });
+
+    if (assignments.length === 0) {
+      return res.json([]); // No assigned products → no reviews
+    }
+
+    const productIds = assignments.map((a) => a.productId);
+
+    // 2. Fetch reviews for those productIds
+    const reviews = await prisma.review.findMany({
+      where: { productId: { in: productIds } },
+      include: {
+        product: true, // include product info
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    res.json(reviews);
+  } catch (err) {
+    console.error("Error fetching user reviews:", err);
+    res.status(500).json({ error: "Server error fetching reviews" });
+  }
+};

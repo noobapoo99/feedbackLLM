@@ -12,6 +12,7 @@ import ProductPage from "./pages/analyst/ProductPage";
 import ProductAnalytics from "./pages/analyst/ProductAnalytics";
 import AdminGlobalAnalytics from "./pages/admin/AdminGlobalAnalytics";
 import CsvUpload from "./pages/admin/csvUploader";
+import MyReviews from "./pages/analyst/MyReviews";
 
 function App() {
   return (
@@ -44,6 +45,15 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/my-reviews"
+            element={
+              <ProtectedRoute role="ANALYST">
+                <MyReviews />
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="/admin"
             element={
