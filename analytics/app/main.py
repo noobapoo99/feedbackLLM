@@ -24,3 +24,17 @@ def analyze(review: Review):
         "sentiment": result["label"].lower(),
         "score": float(result["score"])
     }
+@app.post("/chat-intent")
+def analyze_intent(query: QueryModel):
+    text = query.query.lower()
+
+    if "nps" in text:
+        return { "intent": "nps", "chart": "bar" }
+
+    if "sentiment" in text:
+        return { "intent": "sentiment_breakdown", "chart": "pie" }
+
+    if "trend" in text:
+        return { "intent": "rating_trend", "chart": "line" }
+
+    return { "intent": "unknown" }
