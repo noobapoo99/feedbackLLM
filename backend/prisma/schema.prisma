@@ -17,6 +17,7 @@ model User {
 
   assignments Assignment[]
   reviews     Review[]
+  chats       Chat[]
 }
 
 enum Role {
@@ -61,10 +62,26 @@ model Review {
   user   User?   @relation(fields: [userId], references: [id])
 }
 
-model ChatMessage {
+model Chat {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String   @db.ObjectId
-  message   String
-  sender    String // "user" or "system"
+  user      User     @relation(fields: [userId], references: [id])
+  title     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  archived  Boolean  @default(false)
+
+  messages ChatMessage[]
+}
+
+model ChatMessage {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  chatId String @db.ObjectId
+  chat   Chat   @relation(fields: [chatId], references: [id])
+
+  sender  String // "user" | "assistant" | "system"
+  message String
+
   createdAt DateTime @default(now())
 }

@@ -12,6 +12,9 @@ classifier = pipeline(
 class Review(BaseModel):
     text: str
 
+class QueryModel(BaseModel):
+    query: str
+
 @app.post("/analyze")
 def analyze(review: Review):
     result = classifier(

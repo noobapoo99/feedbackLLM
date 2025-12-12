@@ -86,3 +86,84 @@ export const chatQuery = async (req, res) => {
     chartType: chart,
   });
 };
+export const createChat = async (req, res) => {
+  const { title } = req.body;
+
+  try {
+    const newChat = await prisma.chat.create({
+      data: {
+        title,
+        userId: req.user.id,
+      },
+    });
+
+    res.status(201).json(newChat);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to create chat." });
+    console.error("create chat error:", error);
+  }
+};
+export const getAllChats = async (req, res) => {
+  try {
+    const chats = await prisma.chat.findMany({
+      where: { userId: req.user.id },
+      orderBy: { createdAt: "desc" },
+    });
+
+    res.json(chats);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to retrieve chats." });
+    console.error("get all chats error:", error);
+  }
+};
+export const getChatMessages = async (req, res) => {
+  const chatId = parseInt(req.params.chatId);
+  const { sender, message } = req.body;
+
+  try {
+    const newMessage = await prisma.chatMessage.create({
+      data: {
+        chatId,
+        userId: req.user.id,
+        message,
+        sender,
+      },
+    });
+    await prisma.chat.update({
+      where: { id: chatId },
+      data: { updatedAt: new Date() },
+    });
+    res.json(newMessage);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to retrieve chat messages." });
+    console.error("get chat messages error:", error);
+  }
+};
+export const chatMessages = async (req, res) => {
+  const chatId = parseInt(req.params.chatId);
+
+  try {
+    const messages = await prisma.chatMessage.findMany({
+      where: { chatId, userId: req.user.id },
+      orderBy: { createdAt: "asc" },
+    });
+
+    res.json(messages);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to retrieve chat messages." });
+    console.error("get chat messages error:", error);
+  }
+};
+export const archiveChat = async (req, res) => {
+  const chatId = req.params.chatId;
+  try {
+    await prisma.chat.update({
+      where: { id: parseInt(chatId) },
+      data: { archived: true },
+    });
+    res.json({ message: "Chat archived successfully." });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to archive chat." });
+    console.error("archive chat error:", error);
+  }
+};
