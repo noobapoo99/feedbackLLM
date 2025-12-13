@@ -15,8 +15,11 @@ const router = express.Router();
 
 router.post("/", verifyToken, createChat);
 router.get("/", verifyToken, getAllChats);
-router.post("/:chatId/messages", verifyToken, getChatMessages);
+
+router.get("/:chatId/messages", verifyToken, getChatMessages);
+router.post("/:chatId/messages", verifyToken, chatMessages);
 router.get("/:chatId/messages", verifyToken, chatMessages);
+
 router.patch("/:chatId/archives", verifyToken, archiveChat);
 
 export default router;

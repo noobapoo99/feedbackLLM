@@ -1,10 +1,36 @@
+import { useEffect, useState } from "react";
+import { fetchMessages } from "../../utils/chatApi";
 import ChatInput from "./ChatInput";
 
 interface Props {
+  chat: any;
   onClose: () => void;
 }
 
-export default function ChatWindow({ onClose }: Props) {
+export default function ChatWindow({ chat, onClose }: Props) {
+  const [messages, setMessages] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!chat) {
+      setMessages([]); // 🔑 reset messages
+      return;
+    }
+
+    setLoading(true);
+    fetchMessages(chat.id)
+      .then(setMessages)
+      .finally(() => setLoading(false));
+  }, [chat?.id]);
+
+  if (!chat) {
+    return (
+      <section className="flex-1 flex items-center justify-center">
+        <p className="opacity-60">Select or create a chat</p>
+      </section>
+    );
+  }
+
   return (
     <section className="flex-1 flex flex-col bg-base-100">
       {/* Header */}
@@ -22,21 +48,29 @@ export default function ChatWindow({ onClose }: Props) {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        <div className="chat chat-start">
-          <div className="chat-bubble">
-            Hi! Ask me anything about your dashboard.
-          </div>
-        </div>
+        {loading && <p className="opacity-60">Loading…</p>}
 
-        <div className="chat chat-end">
-          <div className="chat-bubble chat-bubble-primary">
-            Show my negative reviews
-          </div>
-        </div>
+        {!loading &&
+          messages.map((m) => (
+            <div
+              key={m.id}
+              className={`chat ${
+                m.sender === "user" ? "chat-end" : "chat-start"
+              }`}
+            >
+              <div
+                className={`chat-bubble ${
+                  m.sender === "user" ? "chat-bubble-primary" : ""
+                }`}
+              >
+                {m.message}
+              </div>
+            </div>
+          ))}
       </div>
 
-      {/* Input */}
-      <ChatInput />
+      {/* Input only when chat exists */}
+      <ChatInput chatId={chat.id} />
     </section>
   );
 }

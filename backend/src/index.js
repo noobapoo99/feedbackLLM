@@ -39,7 +39,7 @@ app.use("/assignments", assignmentRoutes);
 app.use("/analytics/global", globalAnalyticsRoutes);
 app.use("/reviews", reviewRoutes);
 app.use("/analytics", analyticsRoutes);
-app.use("/chats", chatRoutes);
+app.use("/chat", chatRoutes);
 app.get("/", (req, res) => {
   res.json({ status: "Backend is running" });
 });

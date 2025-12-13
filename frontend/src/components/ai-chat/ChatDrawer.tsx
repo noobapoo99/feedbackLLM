@@ -2,10 +2,20 @@ import ChatSidebar from "./ChatSidebar";
 import ChatWindow from "./ChatWindow";
 
 interface Props {
+  chats: any[];
+  activeChat: any;
+  setChats: (chats: any[]) => void;
+  setActiveChat: (chat: any) => void;
   onClose: () => void;
 }
 
-export default function ChatDrawer({ onClose }: Props) {
+export default function ChatDrawer({
+  chats,
+  activeChat,
+  setChats,
+  setActiveChat,
+  onClose,
+}: Props) {
   return (
     // FULLSCREEN WRAPPER — forces bottom alignment
     <div className="fixed inset-0  right-0 z-40 flex justify-center items-end">
@@ -26,8 +36,13 @@ export default function ChatDrawer({ onClose }: Props) {
           mb-4            /* 👈 spacing from bottom */
         "
       >
-        <ChatSidebar />
-        <ChatWindow onClose={onClose} />
+        <ChatSidebar
+          chats={chats}
+          setChats={setChats}
+          activeChat={activeChat}
+          setActiveChat={setActiveChat}
+        />
+        <ChatWindow chat={activeChat} onClose={onClose} />
       </div>
     </div>
   );

@@ -116,29 +116,31 @@ export const getAllChats = async (req, res) => {
     console.error("get all chats error:", error);
   }
 };
-export const getChatMessages = async (req, res) => {
-  const chatId = parseInt(req.params.chatId);
-  const { sender, message } = req.body;
 
+export const getChatMessages = async (req, res) => {
   try {
-    const newMessage = await prisma.chatMessage.create({
-      data: {
-        chatId,
-        userId: req.user.id,
-        message,
-        sender,
+    const { chatId } = req.params;
+
+    if (!chatId) {
+      return res.status(400).json({ error: "chatId missing" });
+    }
+
+    const messages = await prisma.chatMessage.findMany({
+      where: {
+        chatId: chatId, // ✅ must be string
+      },
+      orderBy: {
+        createdAt: "asc",
       },
     });
-    await prisma.chat.update({
-      where: { id: chatId },
-      data: { updatedAt: new Date() },
-    });
-    res.json(newMessage);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to retrieve chat messages." });
-    console.error("get chat messages error:", error);
+
+    res.json(messages);
+  } catch (err) {
+    console.error("getChatMessages error:", err);
+    res.status(500).json({ error: "Failed to fetch messages" });
   }
 };
+
 export const chatMessages = async (req, res) => {
   const chatId = parseInt(req.params.chatId);
 
@@ -165,5 +167,24 @@ export const archiveChat = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "Failed to archive chat." });
     console.error("archive chat error:", error);
+  }
+};
+export const sendMessage = async (req, res) => {
+  try {
+    const { chatId } = req.params;
+    const { message, sender } = req.body;
+
+    const newMessage = await prisma.chatMessage.create({
+      data: {
+        chatId,
+        sender,
+        message,
+      },
+    });
+
+    res.json(newMessage);
+  } catch (err) {
+    console.error("sendMessage error:", err);
+    res.status(500).json({ error: "Failed to send message" });
   }
 };
