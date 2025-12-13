@@ -1,9 +1,11 @@
 import { PrismaClient } from "@prisma/client";
-export const prisma = new PrismaClient();
 import fetch from "node-fetch";
 
-export async function startAssistantStream(io, socket, chatId) {
+export const prisma = new PrismaClient();
+
+export async function startAssistantStream(io, socket, chatId, context) {
   console.log("🤖 AI streaming started…");
+  console.log("CTX SENT TO PYTHON:", context);
 
   const assistantMsg = await prisma.chatMessage.create({
     data: {
@@ -18,28 +20,29 @@ export async function startAssistantStream(io, socket, chatId) {
 
   socket.emit("assistant:start", { id: msgId });
 
-  // 🔥 Call Python streaming API
   const response = await fetch("http://localhost:8000/chat-stream", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      query: "Generate analysis for this chat", // will be dynamic later
-    }),
+    body: JSON.stringify(context),
   });
 
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
+  for await (const chunk of response.body) {
+    const text = chunk.toString("utf-8");
 
-  while (true) {
-    const { value, done } = await reader.read();
-    if (done) break;
+    // 🔥 Detect action
+    if (text.startsWith("__ACTION__")) {
+      const action = JSON.parse(text.replace("__ACTION__", "").trim());
 
-    const chunk = decoder.decode(value);
-    full += chunk;
+      // Send action to frontend
+      socket.emit("assistant:action", action);
+      continue;
+    }
 
+    // Normal text token
+    full += text;
     socket.emit("assistant:token", {
       id: msgId,
-      chunk,
+      chunk: text,
     });
   }
 

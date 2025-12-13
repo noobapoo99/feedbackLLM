@@ -17,21 +17,48 @@ class Review(BaseModel):
 class QueryModel(BaseModel):
     query: str
 
+class ChatContext(BaseModel):
+    user: dict
+    page: dict
+    uiState: dict | None = None
+    intent: dict | None = None
+    message: str
+
+
 @app.post("/chat-stream")
-def chat_stream(query: QueryModel):
+def chat_stream(ctx: ChatContext):
+
+    print("CTX RECEIVED IN PYTHON:", ctx.dict())
+
     def token_generator():
         
-        fake_tokens = ["Sure", ", ", "here", " is ", "the ", "analysis", "."]
+        action = None
 
-        for token in fake_tokens:
-            yield token
+        if ctx.intent and ctx.intent.get("type") == "sentiment_breakdown":
+            action = {
+                "type": "ui_action",
+                "action": "set_chart",
+                "payload": { "chart": "pie" }
+            }
+
+        if action:
+            yield "__ACTION__" + json.dumps(action) + "\n"
             time.sleep(0.05)
+
+       
+        yield f"You are on the {ctx.page['name']} page. "
+        time.sleep(0.05)
+
+        yield f"I detected intent: {ctx.intent['type']}. "
+        time.sleep(0.05)
+
+        yield f"You asked: {ctx.message}"
 
     return StreamingResponse(
         token_generator(),
         media_type="text/plain"
     )
-        
+      
 @app.post("/analyze")
 def analyze(review: Review):
     result = classifier(
