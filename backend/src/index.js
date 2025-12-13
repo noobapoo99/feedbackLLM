@@ -15,7 +15,7 @@ import analyticsRoutes from "./routes/analytics.routes.js";
 import globalAnalyticsRoutes from "./routes/globalAnalytics.routes.js";
 import uploadCsvRoutes from "./routes/uploadCsv.routes.js";
 import { registerSocketHandlers } from "./socket.js";
-
+import chatRoutes from "./routes/chat.routes.js";
 const app = express();
 const prisma = new PrismaClient();
 app.use(
@@ -39,6 +39,7 @@ app.use("/assignments", assignmentRoutes);
 app.use("/analytics/global", globalAnalyticsRoutes);
 app.use("/reviews", reviewRoutes);
 app.use("/analytics", analyticsRoutes);
+app.use("/chats", chatRoutes);
 app.get("/", (req, res) => {
   res.json({ status: "Backend is running" });
 });

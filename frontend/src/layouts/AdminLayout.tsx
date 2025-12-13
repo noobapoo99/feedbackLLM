@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { Link } from "react-router-dom";
+import AIChat from "../components/ai-chat/AIChat";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
@@ -33,6 +34,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
       {/* MAIN CONTENT */}
       <main className="flex-1 p-8">{children}</main>
+      <AIChat />
     </div>
   );
 }

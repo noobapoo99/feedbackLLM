@@ -1,5 +1,11 @@
 import express from "express";
-import { archiveChat, createChat } from "../controllers/chat.controller.js";
+import {
+  archiveChat,
+  chatMessages,
+  createChat,
+  getAllChats,
+  getChatMessages,
+} from "../controllers/chat.controller.js";
 import { verifyToken } from "../middleware/auth.js";
 import { get } from "svelte/store";
 
