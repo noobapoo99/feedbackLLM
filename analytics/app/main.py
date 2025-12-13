@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from transformers import pipeline
+from fastapi.responses import StreamingResponse
+import time
 
 app = FastAPI()
 
@@ -15,6 +17,21 @@ class Review(BaseModel):
 class QueryModel(BaseModel):
     query: str
 
+@app.post("/chat-stream")
+def chat_stream(query: QueryModel):
+    def token_generator():
+        
+        fake_tokens = ["Sure", ", ", "here", " is ", "the ", "analysis", "."]
+
+        for token in fake_tokens:
+            yield token
+            time.sleep(0.05)
+
+    return StreamingResponse(
+        token_generator(),
+        media_type="text/plain"
+    )
+        
 @app.post("/analyze")
 def analyze(review: Review):
     result = classifier(
