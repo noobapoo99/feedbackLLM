@@ -169,22 +169,36 @@ export const archiveChat = async (req, res) => {
     console.error("archive chat error:", error);
   }
 };
+
 export const sendMessage = async (req, res) => {
   try {
     const { chatId } = req.params;
-    const { message, sender } = req.body;
+    const { message } = req.body;
+
+    if (!chatId || !message) {
+      return res.status(400).json({ error: "chatId or message missing" });
+    }
+
+    // 🔎 ensure chat exists
+    const chat = await prisma.chat.findUnique({
+      where: { id: chatId },
+    });
+
+    if (!chat) {
+      return res.status(404).json({ error: "Chat not found" });
+    }
 
     const newMessage = await prisma.chatMessage.create({
       data: {
-        chatId,
-        sender,
+        chatId, // MUST be string
+        sender: "user", // REQUIRED
         message,
       },
     });
 
     res.json(newMessage);
   } catch (err) {
-    console.error("sendMessage error:", err);
+    console.error("sendMessage error:", err); // 👈 READ THIS LOG
     res.status(500).json({ error: "Failed to send message" });
   }
 };

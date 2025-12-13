@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { fetchMessages } from "../../utils/chatApi";
+import { useEffect, useRef, useState } from "react";
+import { fetchMessages, sendMessage } from "../../utils/chatApi";
 import ChatInput from "./ChatInput";
 
 interface Props {
@@ -10,10 +10,11 @@ interface Props {
 export default function ChatWindow({ chat, onClose }: Props) {
   const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!chat) {
-      setMessages([]); // 🔑 reset messages
+      setMessages([]);
       return;
     }
 
@@ -22,6 +23,33 @@ export default function ChatWindow({ chat, onClose }: Props) {
       .then(setMessages)
       .finally(() => setLoading(false));
   }, [chat?.id]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const handleSend = async (text: string) => {
+    // 1) optimistic message
+    const tempId = `temp-${Date.now()}`;
+    const optimistic = {
+      id: tempId,
+      sender: "user",
+      message: text,
+    };
+    setMessages((prev) => [...prev, optimistic]);
+
+    try {
+      // 2) persist
+      const saved = await sendMessage(chat.id, text);
+
+      // 3) replace optimistic with saved
+      setMessages((prev) => prev.map((m) => (m.id === tempId ? saved : m)));
+    } catch (e) {
+      // 4) rollback on error
+      setMessages((prev) => prev.filter((m) => m.id !== tempId));
+      alert("Failed to send message");
+    }
+  };
 
   if (!chat) {
     return (
@@ -49,7 +77,6 @@ export default function ChatWindow({ chat, onClose }: Props) {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {loading && <p className="opacity-60">Loading…</p>}
-
         {!loading &&
           messages.map((m) => (
             <div
@@ -67,10 +94,11 @@ export default function ChatWindow({ chat, onClose }: Props) {
               </div>
             </div>
           ))}
+        <div ref={bottomRef} />
       </div>
 
-      {/* Input only when chat exists */}
-      <ChatInput chatId={chat.id} />
+      {/* Input */}
+      <ChatInput onSend={handleSend} />
     </section>
   );
 }
