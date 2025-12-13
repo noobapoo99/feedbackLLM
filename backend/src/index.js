@@ -1,5 +1,8 @@
 import express from "express";
 import cors from "cors";
+import { Server } from "socket.io";
+import http from "http";
+import cookieParser from "cookie-parser";
 import { PrismaClient } from "@prisma/client";
 import authRoutes from "./routes/auth.routes.js";
 import { verifyToken } from "./middleware/auth.js";
@@ -11,16 +14,23 @@ import adminRoutes from "./routes/admin.routes.js";
 import analyticsRoutes from "./routes/analytics.routes.js";
 import globalAnalyticsRoutes from "./routes/globalAnalytics.routes.js";
 import uploadCsvRoutes from "./routes/uploadCsv.routes.js";
+import { registerSocketHandlers } from "./socket.js";
 
 const app = express();
 const prisma = new PrismaClient();
-
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
+//app.use(cors());
 app.use(express.json());
-app.use((req, res, next) => {
+/* app.use((req, res, next) => {
   console.log("REQUEST:", req.method, req.path);
   next();
-});
+}); */
+app.use(cookieParser());
 app.use("/auth", authRoutes);
 app.use("/admin", adminRoutes);
 app.use("/products", productRoutes);
@@ -41,4 +51,21 @@ app.get("/protected", verifyToken, (req, res) => {
   res.json({ message: "Access granted", user: req.user });
 });
 
-app.listen(5001, () => console.log("Server running on port 5001"));
+//app.listen(5001, () => console.log("Server running on port 5001"));
+const server = http.createServer(app);
+
+// Create Socket.IO server
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    credentials: true,
+  },
+});
+
+// Register all socket handlers
+registerSocketHandlers(io);
+
+// Start server
+server.listen(5001, () =>
+  console.log("🚀 Server + Socket.IO running on port 5001")
+);
