@@ -16,6 +16,7 @@ import globalAnalyticsRoutes from "./routes/globalAnalytics.routes.js";
 import uploadCsvRoutes from "./routes/uploadCsv.routes.js";
 import { registerSocketHandlers } from "./socket.js";
 import chatRoutes from "./routes/chat.routes.js";
+import { socketAuth } from "./middleware/socketAuth.js";
 const app = express();
 const prisma = new PrismaClient();
 app.use(
@@ -62,7 +63,7 @@ const io = new Server(server, {
     credentials: true,
   },
 });
-
+socketAuth(io);
 // Register all socket handlers
 registerSocketHandlers(io);
 
