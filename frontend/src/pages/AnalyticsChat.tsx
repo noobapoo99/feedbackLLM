@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useAiActions } from "../utils/useAiActions";
 import axios from "axios";
 import {
   LineChart,
@@ -18,6 +19,7 @@ const COLORS = ["#4ade80", "#f87171", "#60a5fa", "#fbbf24", "#a78bfa"];
 
 export default function AnalyticsChat() {
   const [messages, setMessages] = useState<any[]>([]);
+  const [selectedChart, setSelectedChart] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -27,6 +29,15 @@ export default function AnalyticsChat() {
   };
 
   useEffect(scrollToBottom, [messages]);
+
+  // Wire AI actions (e.g. set_chart) to local handlers
+  useAiActions({
+    setChart: (chart) => {
+      setSelectedChart(chart);
+      // clear highlight after a short time
+      setTimeout(() => setSelectedChart(null), 4000);
+    },
+  });
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -99,7 +110,11 @@ export default function AnalyticsChat() {
 
               {/* Render Chart if available */}
               {msg.chartData && (
-                <div className="mt-4 bg-base-200 p-4 rounded-xl shadow-md w-full h-72">
+                <div
+                  className={`mt-4 bg-base-200 p-4 rounded-xl shadow-md w-full h-72 ${
+                    selectedChart === msg.chartType ? "ring-4 ring-primary" : ""
+                  }`}
+                >
                   <ResponsiveContainer width="100%" height="100%">
                     {msg.chartType === "line" && (
                       <LineChart data={msg.chartData}>

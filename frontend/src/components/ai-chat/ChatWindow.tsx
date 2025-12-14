@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { fetchMessages, sendMessage } from "../../utils/chatApi";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { socket } from "../../utils/socket";
 import ChatInput from "./ChatInput";
 
@@ -14,9 +14,10 @@ export default function ChatWindow({ chat, onClose }: Props) {
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
-  const location = useLocation(); // ✅ hook INSIDE component
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  // ✅ build context INSIDE component
+  /* ---------------- CONTEXT ---------------- */
   const context = {
     page: {
       name: location.pathname.includes("reviews")
@@ -26,9 +27,10 @@ export default function ChatWindow({ chat, onClose }: Props) {
         : "dashboard",
       route: location.pathname,
     },
-    uiState: {}, // keep empty for now
+    uiState: {}, // expandable later
   };
 
+  /* ---------------- FETCH CHAT ---------------- */
   useEffect(() => {
     if (!chat) {
       setMessages([]);
@@ -41,14 +43,51 @@ export default function ChatWindow({ chat, onClose }: Props) {
       .finally(() => setLoading(false));
   }, [chat?.id]);
 
+  /* ---------------- AUTO SCROLL ---------------- */
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  /* ---------------- AI ACTION LISTENER (STEP C) ---------------- */
+  useEffect(() => {
+    socket.on("assistant:action", (action) => {
+      console.log("🤖 AI Action received:", action);
+
+      switch (action.action) {
+        case "set_chart":
+          window.dispatchEvent(
+            new CustomEvent("ai:set-chart", {
+              detail: action.payload.chart,
+            })
+          );
+          break;
+
+        case "apply_filter":
+          window.dispatchEvent(
+            new CustomEvent("ai:apply-filter", {
+              detail: action.payload,
+            })
+          );
+          break;
+
+        case "navigate":
+          navigate(action.payload.route);
+          break;
+
+        default:
+          console.warn("Unknown AI action:", action);
+      }
+    });
+
+    return () => {
+      socket.off("assistant:action");
+    };
+  }, [navigate]);
+
+  /* ---------------- SEND MESSAGE ---------------- */
   const handleSend = async (text: string) => {
     if (!chat) return;
 
-    // 1️⃣ optimistic UI
     const tempId = `temp-${Date.now()}`;
     const optimistic = {
       id: tempId,
@@ -59,25 +98,22 @@ export default function ChatWindow({ chat, onClose }: Props) {
     setMessages((prev) => [...prev, optimistic]);
 
     try {
-      // 2️⃣ persist user message
       const saved = await sendMessage(chat.id, text);
 
-      // 3️⃣ replace optimistic
       setMessages((prev) => prev.map((m) => (m.id === tempId ? saved : m)));
 
-      // 4️⃣ trigger assistant with context ✅ (THIS WAS MISSING)
       socket.emit("user:message", {
         chatId: chat.id,
         message: text,
         context,
       });
-    } catch (e) {
-      // rollback
+    } catch {
       setMessages((prev) => prev.filter((m) => m.id !== tempId));
       alert("Failed to send message");
     }
   };
 
+  /* ---------------- EMPTY STATE ---------------- */
   if (!chat) {
     return (
       <section className="flex-1 flex items-center justify-center">
@@ -86,6 +122,7 @@ export default function ChatWindow({ chat, onClose }: Props) {
     );
   }
 
+  /* ---------------- UI ---------------- */
   return (
     <section className="flex-1 flex flex-col bg-base-100">
       {/* Header */}

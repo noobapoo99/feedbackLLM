@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useAiActions } from "../../utils/useAiActions";
 import AdminLayout from "../../layouts/AdminLayout";
 import axios from "axios";
 import {
@@ -21,6 +22,7 @@ export default function AdminGlobalAnalytics() {
   const [categories, setCategories] = useState<any[]>([]);
   const [topProducts, setTopProducts] = useState<any>(null);
   const [trend, setTrend] = useState<any>(null);
+  const [selectedChart, setSelectedChart] = useState<string | null>(null);
 
   const token = localStorage.getItem("token");
 
@@ -46,6 +48,13 @@ export default function AdminGlobalAnalytics() {
       })
       .then((r) => setTrend(r.data));
   }, []);
+
+  useAiActions({
+    setChart: (chart) => {
+      setSelectedChart(chart);
+      setTimeout(() => setSelectedChart(null), 3500);
+    },
+  });
 
   const pieData = summary
     ? [
@@ -88,19 +97,27 @@ export default function AdminGlobalAnalytics() {
             <div className="bg-base-100 shadow-xl rounded-xl p-4">
               <h3 className="font-semibold mb-3">Sentiment Breakdown</h3>
               <ResponsiveContainer width="100%" height={220}>
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    dataKey="value"
-                    innerRadius={50}
-                    outerRadius={80}
-                  >
-                    {pieData.map((_, idx) => (
-                      <Cell key={idx} fill={colors[idx]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
+                <div
+                  className={
+                    selectedChart === "pie"
+                      ? "ring-4 ring-primary rounded-xl p-2"
+                      : ""
+                  }
+                >
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      dataKey="value"
+                      innerRadius={50}
+                      outerRadius={80}
+                    >
+                      {pieData.map((_, idx) => (
+                        <Cell key={idx} fill={colors[idx]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </div>
               </ResponsiveContainer>
             </div>
 
@@ -112,24 +129,32 @@ export default function AdminGlobalAnalytics() {
                 <p>Loading...</p>
               ) : (
                 <ResponsiveContainer width="100%" height={220}>
-                  <LineChart
-                    data={trend.labels.map((l: any, i: number) => ({
-                      label: l,
-                      count: trend.counts[i],
-                    }))}
+                  <div
+                    className={
+                      selectedChart === "line"
+                        ? "ring-4 ring-primary rounded-xl p-2"
+                        : ""
+                    }
                   >
-                    <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-                    <XAxis dataKey="label" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="count"
-                      stroke="#3b82f6"
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  </LineChart>
+                    <LineChart
+                      data={trend.labels.map((l: any, i: number) => ({
+                        label: l,
+                        count: trend.counts[i],
+                      }))}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+                      <XAxis dataKey="label" />
+                      <YAxis />
+                      <Tooltip />
+                      <Line
+                        type="monotone"
+                        dataKey="count"
+                        stroke="#3b82f6"
+                        strokeWidth={2}
+                        dot={false}
+                      />
+                    </LineChart>
+                  </div>
                 </ResponsiveContainer>
               )}
             </div>
@@ -139,13 +164,21 @@ export default function AdminGlobalAnalytics() {
             <div className="bg-base-100 shadow-xl rounded-xl p-4">
               <h3 className="font-semibold mb-3">Category Performance</h3>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={categories}>
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.12} />
-                  <XAxis dataKey="category" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="totalReviews" fill="#60a5fa" />
-                </BarChart>
+                <div
+                  className={
+                    selectedChart === "bar"
+                      ? "ring-4 ring-primary rounded-xl p-2"
+                      : ""
+                  }
+                >
+                  <BarChart data={categories}>
+                    <CartesianGrid strokeDasharray="3 3" opacity={0.12} />
+                    <XAxis dataKey="category" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="totalReviews" fill="#60a5fa" />
+                  </BarChart>
+                </div>
               </ResponsiveContainer>
             </div>
 

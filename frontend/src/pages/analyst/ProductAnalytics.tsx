@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useAiActions } from "../../utils/useAiActions";
 import { useParams } from "react-router-dom";
 import AnalystLayout from "../../layouts/AnalystLayout";
 import axios from "axios";
@@ -8,6 +9,7 @@ import SentimentPie from "../../components/charts/SentimentPie.tsx";
 export default function ProductAnalytics() {
   const { id } = useParams();
   const [data, setData] = useState<any>(null);
+  const [selectedChart, setSelectedChart] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -18,6 +20,17 @@ export default function ProductAnalytics() {
       .then((res) => setData(res.data))
       .catch((err) => console.error(err));
   }, [id]);
+
+  useAiActions({
+    setChart: (chart) => {
+      setSelectedChart(chart);
+      setTimeout(() => setSelectedChart(null), 3500);
+    },
+    applyFilter: (field, value) => {
+      // simple user feedback — in a full implementation this would apply filters to requests
+      console.log("AI requested filter", field, value);
+    },
+  });
 
   return (
     <AnalystLayout>
@@ -36,7 +49,15 @@ export default function ProductAnalytics() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="col-span-2">
-              <RatingChart productId={id!} />
+              <div
+                className={
+                  selectedChart === "line"
+                    ? "ring-4 ring-primary rounded-xl p-2"
+                    : ""
+                }
+              >
+                <RatingChart productId={id!} />
+              </div>
             </div>
 
             <div>
@@ -50,7 +71,15 @@ export default function ProductAnalytics() {
                 </div>
               </div>
 
-              <SentimentPie sentiment={data.sentimentBreakdown} />
+              <div
+                className={
+                  selectedChart === "pie"
+                    ? "ring-4 ring-primary rounded-xl p-2"
+                    : ""
+                }
+              >
+                <SentimentPie sentiment={data.sentimentBreakdown} />
+              </div>
             </div>
           </div>
         </div>
