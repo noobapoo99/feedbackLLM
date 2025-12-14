@@ -1,11 +1,12 @@
 import ChatSidebar from "./ChatSidebar";
 import ChatWindow from "./ChatWindow";
+import type { Dispatch, SetStateAction } from "react";
 
 interface Props {
   chats: any[];
   activeChat: any;
-  setChats: (chats: any[]) => void;
-  setActiveChat: (chat: any) => void;
+  setChats: Dispatch<SetStateAction<any[]>>;
+  setActiveChat: Dispatch<SetStateAction<any | null>>;
   onClose: () => void;
 }
 

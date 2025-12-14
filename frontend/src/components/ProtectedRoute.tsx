@@ -1,9 +1,10 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
+import type { ReactNode } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { Navigate } from "react-router-dom";
 
 interface Props {
-  children: React.ReactNode;
+  children: ReactNode;
   role?: "ADMIN" | "ANALYST";
 }
 
