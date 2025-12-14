@@ -11,10 +11,14 @@ export default function AnalystDashboard() {
     const token = localStorage.getItem("token");
 
     axios
-      .get("http://localhost:5001/products/assigned", {
+      .get("http://localhost:5001/assignments/me", {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setAssigned(res.data));
+      .then((res) => setAssigned(res.data))
+      .catch((err) => {
+        console.error("Failed to load assigned products:", err);
+        setAssigned([]);
+      });
   }, []);
 
   return (
