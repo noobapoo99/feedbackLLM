@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import fetch from "node-fetch";
+//import fetch from "node-fetch";
 
 export const prisma = new PrismaClient();
 
