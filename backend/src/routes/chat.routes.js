@@ -9,7 +9,6 @@ import {
   updateChat,
 } from "../controllers/chat.controller.js";
 import { verifyToken } from "../middleware/auth.js";
-import { get } from "svelte/store";
 
 const router = express.Router();
 
