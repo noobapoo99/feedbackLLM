@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const analyzeSentiment = async (text) => {
-  const response = await axios.post("http://localhost:8000/analyze", {
+  const response = await axios.post("${process.env.LLM_API_URL}/analyze", {
     text,
   });
 

@@ -1,7 +1,6 @@
 import { createContext, useState, useEffect, ReactNode } from "react";
-import axios from "axios";
 import { API } from "../utils/api";
-import { closeSocket, initSocket } from "../utils/socket";
+import { socket } from "../utils/socket";
 
 interface User {
   id: string;
@@ -26,10 +25,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
   const login = async (email: string, password: string) => {
-    const res = await API.post("/auth/login", {
-      email,
-      password,
-    });
+    const res = await API.post("/auth/login", { email, password });
 
     const token = res.data.token;
     localStorage.setItem("token", token);
@@ -40,21 +36,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     setUser(me.data);
     localStorage.setItem("user", JSON.stringify(me.data));
-    initSocket();
+
+    // 🔑 update socket auth + connect
+    socket.auth = { token };
+    socket.connect();
   };
 
   const logout = () => {
+    socket.disconnect();
+    socket.auth = {};
+
     localStorage.removeItem("token");
-    localStorage.removeItem("user"); // ⭐ clear user
+    localStorage.removeItem("user");
+
     setUser(null);
-    closeSocket();
   };
 
   const checkUser = async () => {
     const token = localStorage.getItem("token");
-
-    // ⭐ If user already stored in localStorage, load it immediately
     const localUser = localStorage.getItem("user");
+
     if (localUser) {
       setUser(JSON.parse(localUser));
     }
@@ -68,6 +69,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       setUser(res.data);
       localStorage.setItem("user", JSON.stringify(res.data));
+
+      socket.auth = { token };
+      socket.connect();
     } catch {
       logout();
     }

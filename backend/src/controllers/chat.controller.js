@@ -12,7 +12,7 @@ export const chatQuery = async (req, res) => {
   });
 
   // 2. Send message to Python LLM (intent detection)
-  const llm = await axios.post("http://localhost:8000/chat-stream", {
+  const llm = await axios.post("${process.env.LLM_API_URL}/chat-stream", {
     query: userMessage,
   });
 

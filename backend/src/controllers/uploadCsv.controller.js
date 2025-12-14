@@ -56,7 +56,7 @@ export const uploadCsv = async (req, res) => {
 
         try {
           const sentimentRes = await axios.post(
-            "http://localhost:8000/analyze",
+            "${process.env.LLM_API_URL}/analyze",
             { text: row["Review Text"] }
           );
 

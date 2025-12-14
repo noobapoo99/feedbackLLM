@@ -16,7 +16,7 @@ export async function startAssistantStream(io, socket, chatId, context) {
 
   socket.emit("assistant:start", { id: msgId });
 
-  const response = await fetch("http://localhost:8000/chat-stream", {
+  const response = await fetch(`${process.env.LLM_API_URL}/chat-stream`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(context),
