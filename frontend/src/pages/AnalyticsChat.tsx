@@ -91,7 +91,7 @@ export default function AnalyticsChat() {
 
         {/* Chat Messages */}
         <div className="flex-1 overflow-y-auto mb-4 space-y-4 max-h-[70vh] pr-2">
-          {messages.map((msg, i) => (
+          {messages.map((msg: any, i: number) => (
             <div
               key={i}
               className={`chat ${
@@ -141,7 +141,7 @@ export default function AnalyticsChat() {
                           fill="#8884d8"
                           label
                         >
-                          {msg.chartData.map((_, idx) => (
+                          {msg.chartData.map((_: any, idx: number) => (
                             <Cell
                               key={idx}
                               fill={COLORS[idx % COLORS.length]}

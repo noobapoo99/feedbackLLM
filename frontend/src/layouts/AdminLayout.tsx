@@ -9,7 +9,13 @@ import {
   LogOut,
   User,
 } from "lucide-react";
-import { useEffect, useRef, useState, useContext } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useContext,
+  ReactNode,
+} from "react";
 import { AuthContext } from "../context/AuthContext";
 
 import AIChat from "../components/ai-chat/AIChat";

@@ -1,11 +1,13 @@
+import React, { useState } from "react";
 import { createChat, updateChat } from "../../utils/chatApi";
-import { useState } from "react";
+
+type Chat = any;
 
 interface Props {
-  chats: any[];
-  setChats: (c: any[]) => void;
-  activeChat: any;
-  setActiveChat: (c: any) => void;
+  chats: Chat[];
+  setChats: React.Dispatch<React.SetStateAction<Chat[]>>;
+  activeChat: Chat | null;
+  setActiveChat: React.Dispatch<React.SetStateAction<Chat | null>>;
 }
 
 export default function ChatSidebar({
@@ -60,7 +62,7 @@ export default function ChatSidebar({
           <p className="text-sm opacity-60">No chats yet</p>
         )}
 
-        {chats.map((chat) => (
+        {chats.map((chat: Chat) => (
           <div
             key={chat.id}
             className={`group flex items-center gap-3 p-2 rounded-md transition-colors cursor-pointer ${
@@ -85,7 +87,9 @@ export default function ChatSidebar({
                       try {
                         const updated = await updateChat(chat.id, editingTitle);
                         setChats((prev) =>
-                          prev.map((c) => (c.id === chat.id ? updated : c))
+                          prev.map((c: Chat) =>
+                            c.id === chat.id ? updated : c
+                          )
                         );
                         setActiveChat({ ...updated });
                       } catch (err) {

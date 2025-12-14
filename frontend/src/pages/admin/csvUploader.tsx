@@ -10,7 +10,7 @@ export default function UploadCSV() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const token = localStorage.getItem("token");
-  const [setUploadedCount] = useState<number | null>(null);
+  const [uploadedCount, setUploadedCount] = useState<number | null>(null);
 
   // Fetch products (admin only)
   useEffect(() => {

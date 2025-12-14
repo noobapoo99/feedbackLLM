@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import AnalystLayout from "../../layouts/AnalystLayout";
+import AddReview from "./AddReview";
 import { API } from "../../utils/api";
 
 export default function ProductPage() {
