@@ -1,4 +1,4 @@
-const API = "http://localhost:5001";
+//const API = "http://localhost:5001";
 
 export async function fetchChats() {
   const token = localStorage.getItem("token");

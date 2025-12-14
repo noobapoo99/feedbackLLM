@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import FloatingButton from "./FloatingButton";
+import FloatingButton from "./FLoatingButton";
 import ChatDrawer from "./ChatDrawer";
 import { fetchChats } from "../../utils/chatApi";
 import { socket } from "../../utils/socket";

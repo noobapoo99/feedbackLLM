@@ -1,5 +1,5 @@
-import { ReactNode, useEffect, useRef, useState, useContext } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useEffect, useRef, useState, useContext } from "react";
+import { Link } from "react-router-dom";
 import { User, LogOut } from "lucide-react";
 import AIChat from "../components/ai-chat/AIChat";
 import { AuthContext } from "../context/AuthContext";
@@ -71,8 +71,6 @@ function ProfileDropdown() {
 }
 
 export default function AnalystLayout({ children }: { children: ReactNode }) {
-  const location = useLocation();
-
   return (
     <div className="min-h-screen flex bg-base-200">
       {/* SIDEBAR */}

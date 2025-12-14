@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 //import { useAiActions } from "../../utils/useAiActions";
 import AdminLayout from "../../layouts/AdminLayout";
-import axios from "axios";
+
 import {
   ResponsiveContainer,
   LineChart,
@@ -23,7 +23,7 @@ export default function AdminGlobalAnalytics() {
   const [categories, setCategories] = useState<any[]>([]);
   const [topProducts, setTopProducts] = useState<any>(null);
   const [trend, setTrend] = useState<any>(null);
-  const [selectedChart, setSelectedChart] = useState<string | null>(null);
+  const [selectedChart] = useState<string | null>(null);
 
   const token = localStorage.getItem("token");
 

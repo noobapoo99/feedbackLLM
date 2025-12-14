@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "../../layouts/AdminLayout";
-import axios from "axios";
+
 import { API } from "../../utils/api";
 
 export default function Users() {

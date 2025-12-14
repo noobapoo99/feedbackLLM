@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 //import { useAiActions } from "../../utils/useAiActions";
 import { useParams } from "react-router-dom";
 import AnalystLayout from "../../layouts/AnalystLayout";
-import axios from "axios";
+
 import RatingChart from "../../components/charts/RatingChart.tsx";
 import SentimentPie from "../../components/charts/SentimentPie.tsx";
 import { API } from "../../utils/api.ts";
@@ -10,7 +10,7 @@ import { API } from "../../utils/api.ts";
 export default function ProductAnalytics() {
   const { id } = useParams();
   const [data, setData] = useState<any>(null);
-  const [selectedChart, setSelectedChart] = useState<string | null>(null);
+  const [selectedChart] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");

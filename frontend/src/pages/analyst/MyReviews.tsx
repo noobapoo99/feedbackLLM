@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+
 import AnalystLayout from "../../layouts/AnalystLayout";
 import { API } from "../../utils/api";
 

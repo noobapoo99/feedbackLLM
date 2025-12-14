@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-//import { useAiActions } from "../utils/useAiActions";
-import axios from "axios";
+
 import {
   LineChart,
   Line,
@@ -14,12 +13,13 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { API } from "../utils/api";
 
 const COLORS = ["#4ade80", "#f87171", "#60a5fa", "#fbbf24", "#a78bfa"];
 
 export default function AnalyticsChat() {
   const [messages, setMessages] = useState<any[]>([]);
-  const [selectedChart, setSelectedChart] = useState<string | null>(null);
+  const [selectedChart] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
