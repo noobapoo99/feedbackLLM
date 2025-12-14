@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import { API } from "../../utils/api";
 
 export default function AddReview({
   productId,
@@ -17,8 +17,8 @@ export default function AddReview({
   const submit = async () => {
     setLoading(true);
 
-    const res = await axios.post(
-      "http://localhost:5001/reviews",
+    const res = await API.post(
+      "/reviews",
       { rating, content, productId },
       { headers: { Authorization: `Bearer ${token}` } }
     );

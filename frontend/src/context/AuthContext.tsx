@@ -1,5 +1,7 @@
 import { createContext, useState, useEffect, ReactNode } from "react";
 import axios from "axios";
+import { API } from "../utils/api";
+import { closeSocket, initSocket } from "../utils/socket";
 
 interface User {
   id: string;
@@ -24,7 +26,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
   const login = async (email: string, password: string) => {
-    const res = await axios.post("http://localhost:5001/auth/login", {
+    const res = await API.post("/auth/login", {
       email,
       password,
     });
@@ -32,18 +34,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const token = res.data.token;
     localStorage.setItem("token", token);
 
-    const me = await axios.get("http://localhost:5001/auth/me", {
+    const me = await API.get("/auth/me", {
       headers: { Authorization: `Bearer ${token}` },
     });
 
     setUser(me.data);
-    localStorage.setItem("user", JSON.stringify(me.data)); // ⭐ KEY CHANGE
+    localStorage.setItem("user", JSON.stringify(me.data));
+    initSocket();
   };
 
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user"); // ⭐ clear user
     setUser(null);
+    closeSocket();
   };
 
   const checkUser = async () => {
@@ -58,7 +62,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!token) return;
 
     try {
-      const res = await axios.get("http://localhost:5001/auth/me", {
+      const res = await API.get("/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
 

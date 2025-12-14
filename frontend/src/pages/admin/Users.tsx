@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "../../layouts/AdminLayout";
 import axios from "axios";
+import { API } from "../../utils/api";
 
 export default function Users() {
   const [users, setUsers] = useState([]);
@@ -8,11 +9,9 @@ export default function Users() {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    axios
-      .get("http://localhost:5001/admin/users", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setUsers(res.data));
+    API.get("/admin/users", {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then((res) => setUsers(res.data));
   }, []);
 
   return (

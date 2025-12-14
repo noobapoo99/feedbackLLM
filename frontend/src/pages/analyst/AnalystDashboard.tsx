@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { API } from "../../utils/api";
 import AnalystLayout from "../../layouts/AnalystLayout";
 import { useNavigate } from "react-router-dom";
 
@@ -10,10 +10,9 @@ export default function AnalystDashboard() {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    axios
-      .get("http://localhost:5001/assignments/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+    API.get("/assignments/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then((res) => setAssigned(res.data))
       .catch((err) => {
         console.error("Failed to load assigned products:", err);

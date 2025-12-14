@@ -5,6 +5,7 @@ import AnalystLayout from "../../layouts/AnalystLayout";
 import axios from "axios";
 import RatingChart from "../../components/charts/RatingChart.tsx";
 import SentimentPie from "../../components/charts/SentimentPie.tsx";
+import { API } from "../../utils/api.ts";
 
 export default function ProductAnalytics() {
   const { id } = useParams();
@@ -13,10 +14,9 @@ export default function ProductAnalytics() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    axios
-      .get(`http://localhost:5001/analytics/product/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+    API.get(`/analytics/product/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then((res) => setData(res.data))
       .catch((err) => console.error(err));
   }, [id]);

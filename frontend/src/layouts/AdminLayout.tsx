@@ -14,6 +14,7 @@ import { useEffect, useRef, useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 import AIChat from "../components/ai-chat/AIChat";
+import { API } from "../utils/api";
 function ProfileDropdown() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -65,7 +66,7 @@ function ProfileDropdown() {
             onClick={async () => {
               try {
                 const token = localStorage.getItem("token");
-                await fetch("http://localhost:5001/auth/logout", {
+                API.post("/auth/logout", {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",

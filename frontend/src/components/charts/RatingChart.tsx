@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import {
   BarChart,
   Bar,
@@ -9,16 +8,16 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import { API } from "../../utils/api";
 
 export default function RatingChart({ productId }: { productId: string }) {
   const [data, setData] = useState<any>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    axios
-      .get(`http://localhost:5001/analytics/product/${productId}/ratings`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+    API.get(`/analytics/product/${productId}/ratings`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then((res) => {
         const formatted = Object.keys(res.data).map((key) => ({
           rating: key,

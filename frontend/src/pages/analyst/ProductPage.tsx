@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import AnalystLayout from "../../layouts/AnalystLayout";
-import axios from "axios";
+import { API } from "../../utils/api";
 
 export default function ProductPage() {
   const { id } = useParams();
@@ -11,14 +11,12 @@ export default function ProductPage() {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:5001/products/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => {
-        setProduct(res.data.product);
-        setReviews(res.data.reviews);
-      });
+    API.get(`/products/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then((res) => {
+      setProduct(res.data.product);
+      setReviews(res.data.reviews);
+    });
   }, []);
 
   const sentimentColor = (s: string) => {

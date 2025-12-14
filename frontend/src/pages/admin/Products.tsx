@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import AdminLayout from "../../layouts/AdminLayout";
-import axios from "axios";
+import { API } from "../../utils/api";
 
 import { AuthContext } from "../../context/AuthContext";
 
@@ -13,14 +13,12 @@ export default function Products() {
 
     const token = localStorage.getItem("token");
 
-    axios
-      .get("http://localhost:5001/products", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => {
-        setProducts(res.data);
-        console.log("Loaded:", res.data);
-      });
+    API.get("/products", {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then((res) => {
+      setProducts(res.data);
+      console.log("Loaded:", res.data);
+    });
   }, [user]); // run only after user is available
 
   return (

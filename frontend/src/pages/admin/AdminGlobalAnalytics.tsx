@@ -16,6 +16,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import { API } from "../../utils/api";
 
 export default function AdminGlobalAnalytics() {
   const [summary, setSummary] = useState<any>(null);
@@ -27,26 +28,18 @@ export default function AdminGlobalAnalytics() {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    axios
-      .get("http://localhost:5001/analytics/global/summary", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((r) => setSummary(r.data));
-    axios
-      .get("http://localhost:5001/analytics/global/categories", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((r) => setCategories(r.data));
-    axios
-      .get("http://localhost:5001/analytics/global/top-products?limit=5", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((r) => setTopProducts(r.data));
-    axios
-      .get("http://localhost:5001/analytics/global/trend?days=30&group=day", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((r) => setTrend(r.data));
+    API.get("/analytics/global/summary", {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then((r) => setSummary(r.data));
+    API.get("/analytics/global/categories", {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then((r) => setCategories(r.data));
+    API.get("/analytics/global/top-products?limit=5", {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then((r) => setTopProducts(r.data));
+    API.get("/analytics/global/trend?days=30&group=day", {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then((r) => setTrend(r.data));
   }, []);
 
   /* useAiActions({

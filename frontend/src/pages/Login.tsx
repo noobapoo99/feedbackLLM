@@ -1,6 +1,7 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import { API } from "../utils/api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -20,10 +21,8 @@ export default function Login() {
 
     try {
       if (isLogin) {
-        // USE AUTH CONTEXT LOGIN
         await login(email, password);
 
-        // Read user from localStorage-loaded context after login
         const storedUser = JSON.parse(localStorage.getItem("user") || "null");
 
         if (storedUser?.role === "ADMIN") {
@@ -35,29 +34,18 @@ export default function Login() {
         return;
       }
 
-      // SIGNUP API CALL
-      const res = await fetch("http://localhost:5001/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-          role: "ANALYST", // default role
-        }),
+      // ✅ SIGNUP (axios)
+      await API.post("/auth/register", {
+        name,
+        email,
+        password,
+        role: "ANALYST",
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Signup failed");
-        return;
-      }
-
-      // Switch to login after signup
+      // After successful signup → switch to login
       setIsLogin(true);
     } catch (err: any) {
-      setError(err.message);
+      setError(err.response?.data?.error || "Authentication failed");
     } finally {
       setLoading(false);
     }

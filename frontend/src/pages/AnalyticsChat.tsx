@@ -56,8 +56,8 @@ export default function AnalyticsChat() {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await axios.post(
-        "http://localhost:5001/chat/query",
+      const res = await API.post(
+        "/chat/query",
         { message: userMessage.text },
         { headers: { Authorization: `Bearer ${token}` } }
       );

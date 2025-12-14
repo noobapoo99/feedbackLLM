@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { User, LogOut } from "lucide-react";
 import AIChat from "../components/ai-chat/AIChat";
 import { AuthContext } from "../context/AuthContext";
+import { API } from "../utils/api";
 
 function ProfileDropdown() {
   const [open, setOpen] = useState(false);
@@ -42,7 +43,7 @@ function ProfileDropdown() {
             onClick={async () => {
               try {
                 const token = localStorage.getItem("token");
-                await fetch("http://localhost:5001/auth/logout", {
+                API.post("/auth/logout", {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",

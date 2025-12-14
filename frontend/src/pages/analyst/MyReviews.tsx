@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import AnalystLayout from "../../layouts/AnalystLayout";
+import { API } from "../../utils/api";
 
 export default function MyReviews() {
   const [reviews, setReviews] = useState<any[]>([]);
@@ -22,12 +23,9 @@ export default function MyReviews() {
     const fetchReviews = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(
-          "http://localhost:5001/reviews/my-reviews",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const res = await API.get("/reviews/my-reviews", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setReviews(res.data);
       } catch (err) {
         console.error(err);

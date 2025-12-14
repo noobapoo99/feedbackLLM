@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { API } from "../../utils/api";
 import { showToast } from "../../utils/toast";
 
 export default function UploadCSV() {
@@ -14,10 +14,9 @@ export default function UploadCSV() {
 
   // Fetch products (admin only)
   useEffect(() => {
-    axios
-      .get("http://localhost:5001/admin/products", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+    API.get("/admin/products", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then((res) => setProducts(res.data))
       .catch((err) => console.error(err));
   }, []);
@@ -40,16 +39,12 @@ export default function UploadCSV() {
       fd.append("file", file);
       fd.append("productId", selectedProductId);
 
-      const res = await axios.post(
-        "http://localhost:5001/admin/csv/upload",
-        fd,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const res = await API.post("/admin/csv/upload", fd, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
       setUploadedCount(res.data.imported);
       setShowSuccess(true);
       showToast(

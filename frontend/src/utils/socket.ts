@@ -1,8 +1,20 @@
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 
-export const socket = io("http://localhost:5001", {
-  autoConnect: false,
-  auth: {
-    token: localStorage.getItem("token"),
-  },
-});
+const BASE_URL = import.meta.env.VITE_API_URL;
+
+export let socket: Socket;
+
+export const initSocket = () => {
+  const token = localStorage.getItem("token");
+  if (!token) return;
+
+  socket = io(BASE_URL, {
+    transports: ["websocket"],
+    auth: { token },
+    withCredentials: true,
+  });
+};
+
+export const closeSocket = () => {
+  socket?.disconnect();
+};

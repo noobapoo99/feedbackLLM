@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "../../layouts/AdminLayout";
-import axios from "axios";
+import { API } from "../../utils/api";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<any>(null);
@@ -8,11 +8,9 @@ export default function AdminDashboard() {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    axios
-      .get("http://localhost:5001/analytics/summary", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setStats(res.data));
+    API.get("/analytics/summary", {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then((res) => setStats(res.data));
   }, []);
 
   return (

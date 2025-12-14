@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "../../layouts/AdminLayout";
-import axios from "axios";
+import { API } from "../../utils/api";
 
 export default function AssignProducts() {
   const [users, setUsers] = useState([]);
@@ -12,24 +12,20 @@ export default function AssignProducts() {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    axios
-      .get("http://localhost:5001/admin/analysts", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setUsers(res.data));
+    API.get("/admin/analysts", {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then((res) => setUsers(res.data));
 
-    axios
-      .get("http://localhost:5001/products", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setProducts(res.data));
+    API.get("/products", {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then((res) => setProducts(res.data));
   }, []);
 
   const assign = async () => {
     const token = localStorage.getItem("token");
 
-    await axios.post(
-      "http://localhost:5001/assignments",
+    await API.post(
+      "/assignments",
       {
         userId: selectedUser,
         productId: selectedProduct,
