@@ -63,3 +63,15 @@ export const getMe = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// LOGOUT
+export const logout = async (req, res) => {
+  try {
+    // For JWT stateless auth we cannot fully invalidate a token here without
+    // a token store/blacklist. Still expose an endpoint so clients can call it
+    // and the server can clear any cookie-based tokens in future.
+    return res.json({ message: "Logout success" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

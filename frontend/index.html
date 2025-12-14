@@ -8,16 +8,15 @@
 
   <!-- ⭐ Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- ⭐ DaisyUI plugin (load before tailwind.config) -->
+  <script src="https://cdn.jsdelivr.net/npm/daisyui@4.6.0/dist/full.js"></script>
 
-  <!-- ⭐ DaisyUI plugin -->
+  <!-- Configure Tailwind to use DaisyUI -->
   <script>
     tailwind.config = {
       plugins: [daisyui],
     };
   </script>
-
-  <!-- OPTIONAL: DaisyUI theme -->
-  <script src="https://cdn.jsdelivr.net/npm/daisyui@4.6.0/dist/full.js"></script>
 </head>
 
 <body>
