@@ -1,5 +1,38 @@
 //const API = "http://localhost:5001";
+// src/utils/chatApi.ts
 
+import { API } from "./api"; // adjust path if needed
+
+export async function fetchChats() {
+  const res = await API.get("/chat");
+  return res.data;
+}
+
+export async function fetchMessages(chatId: string) {
+  const res = await API.get(`/chat/${chatId}/messages`);
+  return res.data;
+}
+
+export async function createChat() {
+  const res = await API.post("/chat");
+  return res.data;
+}
+
+export async function sendMessage(chatId: string, message: string) {
+  const res = await API.post(`/chat/${chatId}/messages/new`, {
+    message,
+  });
+  return res.data;
+}
+
+export async function updateChat(chatId: string, title: string) {
+  const res = await API.patch(`/chat/${chatId}`, {
+    title,
+  });
+  return res.data;
+}
+
+/* 
 export async function fetchChats() {
   const token = localStorage.getItem("token");
 
@@ -71,3 +104,4 @@ export async function updateChat(chatId: string, title: string) {
   if (!res.ok) throw new Error("Failed to update chat");
   return res.json();
 }
+ */
