@@ -135,25 +135,35 @@ export default function ChatWindow({ chat, onClose }: any) {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {loading && <p className="opacity-100">Loading…</p>}
+      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
+        {loading && <p className="opacity-60">Loading…</p>}
 
-        {messages.map((m) => (
-          <div
-            key={m.id}
-            className={`chat ${
-              m.sender === "user" ? "chat-end" : "chat-start"
-            }`}
-          >
+        {!loading && messages.length === 0 && (
+          <p className="text-sm opacity-60">No messages yet — say hello 👋</p>
+        )}
+
+        {messages.map((m) => {
+          const isUser = m.sender === "user";
+
+          return (
             <div
-              className={`chat-bubble ${
-                m.sender === "user" ? "chat-bubble-primary" : ""
+              key={m.id}
+              className={`w-full flex ${
+                isUser ? "justify-end" : "justify-start"
               }`}
             >
-              {m.message}
+              <div
+                className={`inline-block p-3 max-w-[70%] break-words shadow-sm ${
+                  isUser
+                    ? "bg-green-600 text-white rounded-lg rounded-tr-none"
+                    : "bg-gray-100 text-gray-800 rounded-lg rounded-tl-none"
+                }`}
+              >
+                {m.message || (isUser ? "" : "...")}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         <div ref={bottomRef} />
       </div>
