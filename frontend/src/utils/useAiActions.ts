@@ -1,40 +1,30 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+export type UIAction =
+  | { type: "set_chart"; chart: "pie" | "bar" | "line" }
+  | { type: "apply_filter"; filter: string }
+  | { type: "reset_view" };
 
-type AiAction =
-  | { action: "set_chart"; payload: { chart: string } }
-  | { action: "apply_filter"; payload: { field: string; value: any } }
-  | { action: "navigate"; payload: { route: string } };
+export function handleUIAction(
+  action: UIAction,
+  handlers: {
+    setChart?: (chart: string) => void;
+    applyFilter?: (filter: string) => void;
+    resetView?: () => void;
+  }
+) {
+  switch (action.type) {
+    case "set_chart":
+      handlers.setChart?.(action.chart);
+      break;
 
-export function useAiActions(handlers: {
-  setChart?: (chart: string) => void;
-  applyFilter?: (field: string, value: any) => void;
-}) {
-  const navigate = useNavigate();
+    case "apply_filter":
+      handlers.applyFilter?.(action.filter);
+      break;
 
-  useEffect(() => {
-    const handler = (e: any) => {
-      const action = e.detail;
+    case "reset_view":
+      handlers.resetView?.();
+      break;
 
-      switch (action.action) {
-        case "set_chart":
-          handlers.setChart?.(action.payload.chart);
-          break;
-
-        case "apply_filter":
-          handlers.applyFilter?.(action.payload.field, action.payload.value);
-          break;
-
-        case "navigate":
-          navigate(action.payload.route);
-          break;
-      }
-    };
-
-    window.addEventListener("ai:action", handler);
-
-    return () => {
-      window.removeEventListener("ai:action", handler);
-    };
-  }, []);
+    default:
+      console.warn("Unknown UI action:", action);
+  }
 }

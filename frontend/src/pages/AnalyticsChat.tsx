@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useAiActions } from "../utils/useAiActions";
+//import { useAiActions } from "../utils/useAiActions";
 import axios from "axios";
 import {
   LineChart,
@@ -31,13 +31,13 @@ export default function AnalyticsChat() {
   useEffect(scrollToBottom, [messages]);
 
   // Wire AI actions (e.g. set_chart) to local handlers
-  useAiActions({
+  /*  useAiActions({
     setChart: (chart) => {
       setSelectedChart(chart);
       // clear highlight after a short time
       setTimeout(() => setSelectedChart(null), 4000);
     },
-  });
+  }); */
 
   const sendMessage = async () => {
     if (!input.trim()) return;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAiActions } from "../../utils/useAiActions";
+//import { useAiActions } from "../../utils/useAiActions";
 import { useParams } from "react-router-dom";
 import AnalystLayout from "../../layouts/AnalystLayout";
 import axios from "axios";
@@ -21,7 +21,7 @@ export default function ProductAnalytics() {
       .catch((err) => console.error(err));
   }, [id]);
 
-  useAiActions({
+  /*  useAiActions({
     setChart: (chart) => {
       setSelectedChart(chart);
       setTimeout(() => setSelectedChart(null), 3500);
@@ -30,7 +30,7 @@ export default function ProductAnalytics() {
       // simple user feedback — in a full implementation this would apply filters to requests
       console.log("AI requested filter", field, value);
     },
-  });
+  }); */
 
   return (
     <AnalystLayout>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAiActions } from "../../utils/useAiActions";
+//import { useAiActions } from "../../utils/useAiActions";
 import AdminLayout from "../../layouts/AdminLayout";
 import axios from "axios";
 import {
@@ -49,12 +49,12 @@ export default function AdminGlobalAnalytics() {
       .then((r) => setTrend(r.data));
   }, []);
 
-  useAiActions({
+  /* useAiActions({
     setChart: (chart) => {
       setSelectedChart(chart);
       setTimeout(() => setSelectedChart(null), 3500);
     },
-  });
+  }); */
 
   const pieData = summary
     ? [

@@ -4,12 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { socket } from "../../utils/socket";
 import ChatInput from "./ChatInput";
 
-interface Props {
-  chat: any;
-  onClose: () => void;
-}
-
-export default function ChatWindow({ chat, onClose }: Props) {
+export default function ChatWindow({ chat, onClose }: any) {
   const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
@@ -17,7 +12,7 @@ export default function ChatWindow({ chat, onClose }: Props) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  /* ---------------- CONTEXT ---------------- */
+  /* ---------- CONTEXT ---------- */
   const context = {
     page: {
       name: location.pathname.includes("reviews")
@@ -27,10 +22,10 @@ export default function ChatWindow({ chat, onClose }: Props) {
         : "dashboard",
       route: location.pathname,
     },
-    uiState: {}, // expandable later
+    uiState: {},
   };
 
-  /* ---------------- FETCH CHAT ---------------- */
+  /* ---------- FETCH CHAT ---------- */
   useEffect(() => {
     if (!chat) {
       setMessages([]);
@@ -43,59 +38,60 @@ export default function ChatWindow({ chat, onClose }: Props) {
       .finally(() => setLoading(false));
   }, [chat?.id]);
 
-  /* ---------------- AUTO SCROLL ---------------- */
+  /* ---------- AUTOSCROLL ---------- */
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  /* ---------------- AI ACTION LISTENER (STEP C) ---------------- */
+  /* ---------- SOCKET HANDLERS ---------- */
   useEffect(() => {
-    socket.on("assistant:action", (action) => {
-      console.log("🤖 AI Action received:", action);
+    /* assistant message created */
+    socket.on("assistant:start", ({ id }) => {
+      setMessages((prev) => [
+        ...prev,
+        { id, sender: "assistant", message: "" },
+      ]);
+    });
 
-      switch (action.action) {
-        case "set_chart":
+    socket.on("assistant:token", ({ id, chunk }) => {
+      console.log("AI TOKEN:", chunk);
+
+      if (chunk.startsWith("__ACTION__")) {
+        const action = JSON.parse(chunk.replace("__ACTION__", ""));
+        console.log("AI ACTION:", action);
+
+        if (context.page.name === "reviews") {
           window.dispatchEvent(
-            new CustomEvent("ai:set-chart", {
-              detail: action.payload.chart,
-            })
+            new CustomEvent("ai:reviews", { detail: action })
           );
-          break;
+        }
 
-        case "apply_filter":
-          window.dispatchEvent(
-            new CustomEvent("ai:apply-filter", {
-              detail: action.payload,
-            })
-          );
-          break;
-
-        case "navigate":
-          navigate(action.payload.route);
-          break;
-
-        default:
-          console.warn("Unknown AI action:", action);
+        return;
       }
+
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === id ? { ...m, message: m.message + chunk } : m
+        )
+      );
     });
 
     return () => {
-      socket.off("assistant:action");
+      socket.off("assistant:start");
+      socket.off("assistant:token");
     };
   }, [navigate]);
 
-  /* ---------------- SEND MESSAGE ---------------- */
+  /* ---------- SEND MESSAGE ---------- */
   const handleSend = async (text: string) => {
     if (!chat) return;
 
     const tempId = `temp-${Date.now()}`;
-    const optimistic = {
-      id: tempId,
-      sender: "user",
-      message: text,
-    };
 
-    setMessages((prev) => [...prev, optimistic]);
+    setMessages((prev) => [
+      ...prev,
+      { id: tempId, sender: "user", message: text },
+    ]);
 
     try {
       const saved = await sendMessage(chat.id, text);
@@ -113,7 +109,7 @@ export default function ChatWindow({ chat, onClose }: Props) {
     }
   };
 
-  /* ---------------- EMPTY STATE ---------------- */
+  /* ---------- EMPTY ---------- */
   if (!chat) {
     return (
       <section className="flex-1 flex items-center justify-center">
@@ -122,9 +118,9 @@ export default function ChatWindow({ chat, onClose }: Props) {
     );
   }
 
-  /* ---------------- UI ---------------- */
+  /* ---------- UI ---------- */
   return (
-    <section className="flex-1 flex flex-col bg-base-100">
+    <section className="flex-1 flex flex-col bg-white">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b bg-base-200">
         <div>
@@ -140,30 +136,28 @@ export default function ChatWindow({ chat, onClose }: Props) {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {loading && <p className="opacity-60">Loading…</p>}
+        {loading && <p className="opacity-100">Loading…</p>}
 
-        {!loading &&
-          messages.map((m) => (
+        {messages.map((m) => (
+          <div
+            key={m.id}
+            className={`chat ${
+              m.sender === "user" ? "chat-end" : "chat-start"
+            }`}
+          >
             <div
-              key={m.id}
-              className={`chat ${
-                m.sender === "user" ? "chat-end" : "chat-start"
+              className={`chat-bubble ${
+                m.sender === "user" ? "chat-bubble-primary" : ""
               }`}
             >
-              <div
-                className={`chat-bubble ${
-                  m.sender === "user" ? "chat-bubble-primary" : ""
-                }`}
-              >
-                {m.message}
-              </div>
+              {m.message}
             </div>
-          ))}
+          </div>
+        ))}
 
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
       <ChatInput onSend={handleSend} />
     </section>
   );

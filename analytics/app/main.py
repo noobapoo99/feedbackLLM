@@ -9,15 +9,8 @@ from typing import Optional, Dict
 
 app = FastAPI()
 
-# ===============================
-# 🔐 Groq Client
-# ===============================
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 client = Groq(api_key=GROQ_API_KEY)
-
-# ===============================
-# 📦 Schemas
-# ===============================
 
 class ChatContext(BaseModel):
     user: Dict
@@ -26,11 +19,23 @@ class ChatContext(BaseModel):
     message: str
 
 
-# ===============================
-# 🧠 Prompt Builder
-# ===============================
-
 def build_prompt(ctx: ChatContext) -> str:
+    page = ctx.page.get("name")
+
+    if page == "reviews":
+        ui_capabilities = """
+Allowed UI actions:
+- filter_sentiment (positive | negative | neutral)
+- reset_reviews
+"""
+    elif page == "analytics":
+        ui_capabilities = """
+Allowed UI actions:
+- set_chart (pie | bar | line)
+"""
+    else:
+        ui_capabilities = "No UI actions available."
+
     return f"""
 You are an AI assistant embedded inside a web dashboard.
 
@@ -38,31 +43,48 @@ You MUST respond in valid JSON ONLY.
 
 Schema:
 {{
-  "reply": string,
+  "reply": "string",
   "ui_action": null | {{
-    "type": "set_chart",
-    "chart": "pie" | "bar" | "line"
+    "type": "set_chart" | "filter_sentiment" | "reset_reviews" | "navigate",
+    "chart": "pie" | "bar" | "line",
+    "sentiment": "positive" | "negative" | "neutral",
+    "route": "string"
   }}
 }}
 
 Rules:
-- If the user asks to visualize data, include ui_action
-- If no UI change is needed, set ui_action to null
-- Do not include markdown
-- Do not include explanations outside JSON
+- You MUST emit ui_action when the page is "reviews" and the user asks to filter or reset
+- "show positive reviews" → filter_sentiment + positive
+- "show negative reviews" → filter_sentiment + negative
+- "reset" → reset_reviews
+- ui_action MUST NOT be null in these cases
+- Never emit set_chart on reviews page
+- Do NOT include markdown
+- Do NOT include explanations outside JSON
+
 
 Context:
-- Page: {ctx.page.get("name")}
+- Page: {page}
 - Route: {ctx.page.get("route")}
+
+{ui_capabilities}
+
+Example:
+User: show positive reviews
+Response:
+{{
+  "reply": "Showing positive reviews.",
+  "ui_action": {{
+    "type": "filter_sentiment",
+    "sentiment": "positive"
+  }}
+}}
 
 User message:
 {ctx.message}
 """
 
 
-# ===============================
-# 🤖 Groq Call
-# ===============================
 
 def call_groq(prompt: str) -> Dict:
     response = client.chat.completions.create(
@@ -77,16 +99,11 @@ def call_groq(prompt: str) -> Dict:
     try:
         return json.loads(raw)
     except json.JSONDecodeError:
-        # Fallback safety
         return {
             "reply": raw,
             "ui_action": None
         }
 
-
-# ===============================
-# 🌊 Streaming Endpoint
-# ===============================
 
 @app.post("/chat-stream")
 def chat_stream(ctx: ChatContext):
@@ -95,43 +112,13 @@ def chat_stream(ctx: ChatContext):
     def stream():
         result = call_groq(build_prompt(ctx))
 
-        # 1️⃣ Send UI action first (if exists)
         if result.get("ui_action"):
             yield "__ACTION__" + json.dumps(result["ui_action"]) + "\n"
             time.sleep(0.05)
 
-        # 2️⃣ Stream reply text token-by-token
         reply = result.get("reply", "")
         for token in reply.split(" "):
             yield token + " "
             time.sleep(0.02)
 
     return StreamingResponse(stream(), media_type="text/plain")
-  
-""" @app.post("/analyze")
-def analyze(review: Review):
-    result = classifier(
-        review.text,
-        truncation=True,   
-        max_length=512
-    )[0]
-
-    return {
-        "sentiment": result["label"].lower(),
-        "score": float(result["score"])
-    }
-@app.post("/chat-intent")
-def analyze_intent(query: QueryModel):
-    text = query.query.lower()
-
-    if "nps" in text:
-        return { "intent": "nps", "chart": "bar" }
-
-    if "sentiment" in text:
-        return { "intent": "sentiment_breakdown", "chart": "pie" }
-
-    if "trend" in text:
-        return { "intent": "rating_trend", "chart": "line" }
-
-    return { "intent": "unknown" }
- """

@@ -4,24 +4,29 @@ import AIChat from "../components/ai-chat/AIChat";
 
 export default function AnalystLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex bg-base-200 min-h-screen">
-      {/* Sidebar */}
-      <aside className="w-64 bg-base-100 shadow-lg p-5 flex flex-col gap-4">
-        <h2 className="text-2xl font-bold mb-4">Analyst Panel</h2>
+    <>
+      {/* Main layout */}
+      <div className="flex bg-base-200 min-h-screen">
+        {/* Sidebar */}
+        <aside className="w-64 bg-base-100 shadow-lg p-5 flex flex-col gap-4">
+          <h2 className="text-2xl font-bold mb-4">Analyst Panel</h2>
 
-        <nav className="flex flex-col gap-2">
-          <Link className="btn btn-ghost justify-start" to="/dashboard">
-            Assigned Products
-          </Link>
+          <nav className="flex flex-col gap-2">
+            <Link className="btn btn-ghost justify-start" to="/dashboard">
+              Assigned Products
+            </Link>
 
-          <Link className="btn btn-ghost justify-start" to="/my-reviews">
-            My Reviews
-          </Link>
-        </nav>
-      </aside>
+            <Link className="btn btn-ghost justify-start" to="/my-reviews">
+              My Reviews
+            </Link>
+          </nav>
+        </aside>
 
-      <main className="flex-1 p-8 relative">{children}</main>
+        <main className="flex-1 p-8 relative">{children}</main>
+      </div>
+
+      {/* 🔥 AI Chat OUTSIDE layout */}
       <AIChat />
-    </div>
+    </>
   );
 }
