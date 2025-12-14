@@ -6,6 +6,7 @@ import {
   getAllChats,
   getChatMessages,
   sendMessage,
+  updateChat,
 } from "../controllers/chat.controller.js";
 import { verifyToken } from "../middleware/auth.js";
 import { get } from "svelte/store";
@@ -22,5 +23,6 @@ router.post("/:chatId/messages", verifyToken, chatMessages);
 router.post("/:chatId/messages/new", verifyToken, sendMessage);
 
 router.patch("/:chatId/archives", verifyToken, archiveChat);
+router.patch("/:chatId", verifyToken, updateChat);
 
 export default router;

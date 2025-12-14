@@ -103,6 +103,24 @@ export const createChat = async (req, res) => {
     console.error("create chat error:", error);
   }
 };
+export const updateChat = async (req, res) => {
+  try {
+    const { chatId } = req.params;
+    const { title } = req.body;
+
+    if (!chatId) return res.status(400).json({ error: "chatId missing" });
+
+    const updated = await prisma.chat.update({
+      where: { id: chatId },
+      data: { title },
+    });
+
+    res.json(updated);
+  } catch (error) {
+    console.error("updateChat error:", error);
+    res.status(500).json({ error: "Failed to update chat." });
+  }
+};
 export const getAllChats = async (req, res) => {
   try {
     const chats = await prisma.chat.findMany({

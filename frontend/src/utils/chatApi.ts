@@ -55,3 +55,19 @@ export async function sendMessage(chatId: string, message: string) {
   if (!res.ok) throw new Error("Failed to send message");
   return res.json();
 }
+
+export async function updateChat(chatId: string, title: string) {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`http://localhost:5001/chat/${chatId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ title }),
+  });
+
+  if (!res.ok) throw new Error("Failed to update chat");
+  return res.json();
+}
